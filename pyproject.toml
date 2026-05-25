@@ -1,0 +1,10 @@
+[build-system]
+requires = ["scikit-build-core", "nanobind"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "snake_ai"
+version = "0.1.0"
+description = "A C++ RL agent for a Python Snake game"
+readme = "README.md"
+requires-python = ">=3.8"
