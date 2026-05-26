@@ -1,5 +1,12 @@
-//Test
-
+/**
+ * @file main.cpp
+ * @brief Nanobind glue layer exporting the C++ SnakeEngine to Python.
+ * @author Sam Ro
+ * @date 26/05/2026
+ * @details This file uses the nanobind library to expose the C++ SnakeEngine 
+ * class and its methods directly to the Python ecosystem, allowing the engine 
+ * to be imported as a native Python module ('my_ai'). (Description made by AI)
+ */
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/vector.h> // Crucial for auto-converting Python lists to C++ vectors
 #include <vector>

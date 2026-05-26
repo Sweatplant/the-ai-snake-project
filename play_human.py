@@ -1,5 +1,3 @@
-#test 2
-
 import my_ai
 
 def main():

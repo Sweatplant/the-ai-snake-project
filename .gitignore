@@ -1,0 +1,17 @@
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Build system files
+build/
+dist/
+*.egg-info/
+.scikit-build/
+
+# IDE/Editor folders
+.vscode/
+.idea/
+
+# Windows/OS files
+Thumbs.db
