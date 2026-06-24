@@ -1,60 +1,110 @@
 # The AI Snake Project
 
-A Python-accessible Snake agent built in C++ using `nanobind`.
+A high-performance C++ Snake engine wrapped in Python using `nanobind`.
 
-## Overview
+## What it is
 
-This repository demonstrates building a native Python extension module named `my_ai` from `src/agent.cpp` and packaging it with `scikit-build-core`.
+This project includes:
 
-The package distribution name is `snake_ai`, while the imported module is `my_ai`.
+- a C++ game engine in [src](src)
+- a Python module built with nanobind
+- a playable version in [play_human.py](play_human.py)
+- a placeholder training script in [train_ai.py](train_ai.py)
 
 ## Requirements
 
-- Python 3.8+
-- Windows with Visual Studio Build Tools (or compatible C++ toolchain)
-- `pip`
-- `cmake` (installed automatically by the build backend)
+Make sure you have:
 
-## Install
+- Python 3.8 or newer
+- Windows PowerShell
+- CMake
+- Visual Studio Build Tools with the Desktop development with C++ workload
 
-From the repository root:
+## Setup
 
-```powershell
-python -m pip install .
-```
+Open a terminal in the folder where you cloned or downloaded this repository.
 
-If you need to reinstall after changes:
+If needed, change into the project folder:
 
 ```powershell
-python -m pip install --force-reinstall .
+cd path\to\the-ai-snake-project
 ```
 
-## Usage
-
-Run the game script or import the extension directly:
+Create and activate a virtual environment:
 
 ```powershell
-python game.py
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-Or use the module in Python:
+If PowerShell blocks script execution, run:
 
-```python
-import my_ai
-agent = my_ai.SnakeAI()
-action = agent.get_action([5, 10, 5, 12, 1])
-print(action)
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
 
-## Project layout
+Then activate the environment again.
 
-- `CMakeLists.txt` - builds the `my_ai` extension module with `nanobind`
-- `pyproject.toml` - Python packaging metadata for `snake_ai`
-- `src/agent.cpp` - C++ implementation of the Snake AI module
-- `game.py` - example Python usage
+Upgrade pip:
 
-## Notes
+```powershell
+python -m pip install --upgrade pip
+```
 
-- The compiled module is exposed as `my_ai`.
-- The package name installed by `pip` is `snake_ai`.
-- If `import my_ai` fails after installation, ensure the package build includes the extension module and reinstall.
+Install the required packages:
+
+```powershell
+python -m pip install pygame
+pip install . --force-reinstall --no-cache-dir --config-settings=cmake.args="-A x64"
+```
+
+The second command builds the native extension.
+
+## Run the game
+
+Start the game with:
+
+```powershell
+python play_human.py
+```
+
+Use the arrow keys to move the snake. If you hit a wall or your own tail, the round resets.
+
+## Project files
+
+- [play_human.py]: runs the human-playable version
+- [train_ai.py]: placeholder for future training work
+- [src/main.cpp]: Python/C++ binding entry point
+- [src/snake_engine.cpp]: game logic
+- [src/snake_engine.hpp]: engine declarations
+- [snake_ui/renderer.py]: rendering code
+- [CMakeLists.txt] & [pyproject.toml]: The backend build configuration files.
+
+## Troubleshooting
+
+If the build fails, make sure Visual Studio Build Tools are installed and that the C++ workload is enabled.
+
+If Python cannot import the compiled module, run:
+
+```powershell
+pip install . --force-reinstall --no-cache-dir --config-settings=cmake.args="-A x64"
+```
+
+If activation is blocked by PowerShell, run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+## Quick start
+
+If you want the short version, run:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install pygame
+pip install . --force-reinstall --no-cache-dir --config-settings=cmake.args="-A x64"
+python play_human.py
+```

@@ -3,7 +3,7 @@
  * @brief Core mechanics, movement physics, and collision logic implementation.
  * @author Sam Ro
  * @version 1.0
- * @date 26/05/2026
+ * @date 24/06/2026
  * @details This file implements the SnakeEngine game loop methods. It processes
  * inputs, handles snake slithering/growth, calculates wall and self collisions,
  * and manages random food generation using standard library mechanics. (Description made by AI)
@@ -53,8 +53,7 @@ void SnakeEngine::spawn_food() {
                 break;
             }
         }
-
-        if (!overlaps) {
+        if (overlaps == false) {
             food_pos = potential_food_pos;
             break;
         }
@@ -75,7 +74,7 @@ bool SnakeEngine::step(int action) {
         current_dir = requested_dir;
     }
     
-    // wall collision check
+    // calculate new head position
     std::pair<int, int> new_head = snake.front();
     switch (current_dir) {
         case UP: new_head.second -= 1; break;
@@ -84,12 +83,33 @@ bool SnakeEngine::step(int action) {
         case RIGHT: new_head.first += 1; break;
     }
 
-    // self collision check
-    if (new_head.first < 0 || new_head.first >= width || 
+    // wall collision check
+     if (new_head.first < 0 || new_head.first >= width || 
         new_head.second < 0 || new_head.second >= height) {
         game_over = true;
         return false;
     }
 
+    // self collision check
+    for (const auto& segment : snake) {
+        if (segment == new_head) {
+            game_over = true;
+            return false;
+        }
+    }
 
-)
+    // move the snake
+    snake.insert(snake.begin(), new_head);
+
+    // check if food is eaten
+    if (new_head == food_pos) {
+        // if eaten, leave tail and increase score, then spawn new food
+        score += 1;
+        spawn_food();
+    } else {
+        // if not eaten, remove tail
+        snake.pop_back();
+    }
+
+    return true;
+}

@@ -11,7 +11,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Create the Python module named 'my_ai' using your C++ file
-nanobind_add_module(my_ai src/agent.cpp)
+nanobind_add_module(
+    my_ai
+    src/main.cpp
+    src/snake_engine.cpp
+)
 
 # Install the compiled extension into the Python package root
 install(TARGETS my_ai
