@@ -32,7 +32,7 @@ def main():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = false
+                running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     current_action = 0
