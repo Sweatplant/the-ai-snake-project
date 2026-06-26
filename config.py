@@ -10,12 +10,13 @@ GRID_WIDTH = 20
 GRID_HEIGHT = 20
 CELL_SIZE = 30
 FPS = 0                 # Simulation speed (set 0 for max speed)
-RENDERER_ENABLED = False           
+RENDERER_ENABLED = False 
+TRAINING_ENABLED = True          
 
 # --- Agent Selection ---
-AGENT_TYPE = "human"        # Play manually with arrowkeys
+# AGENT_TYPE = "human"        # Play manually with arrowkeys
 # AGENT_TYPE = "heuristic"    # Rule-based AI agent (Mean score: ~28, Max score: ~87)
-# AGENT_TYPE = "tabular"
+AGENT_TYPE = "tabular"
 # AGENT_TYPE = "dqn"
 # AGENT_TYPE = "pgm"
 
