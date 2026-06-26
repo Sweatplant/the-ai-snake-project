@@ -11,6 +11,7 @@ best move (Straight, Right, Left) to survive and eat food. The code is a sloppy 
 """
 
 import random
+import config
 
 class HeuristicAgent:
     def __init__(self):
@@ -21,8 +22,8 @@ class HeuristicAgent:
         self.RIGHT = 3    
 
         # grid size
-        self.width = 20
-        self.height = 20
+        self.width = config.GRID_WIDTH
+        self.height = config.GRID_HEIGHT
 
     def get_state(self, engine):
         """

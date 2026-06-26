@@ -58,7 +58,7 @@ def main():
         # frame rate control
         clock.tick(10)  # 10 FPS
 
-    renderer.close()
+    pygame.quit()
 
 if __name__ == "__main__":
     main()
