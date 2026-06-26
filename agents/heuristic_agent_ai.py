@@ -1,13 +1,13 @@
 """
-@file heuristic_agent2.py
+@file heuristic_agent_ai.py
 @brief Heuristic (rule-based) agent for the Snake game.
 @author AI
 @date 25/06/2026
-@version 2.0
+@version 1.0
 @details This agent uses hardcoded rules to play the Snake game.
 It calculates an 11-value binary state vector representing immediate 
 dangers and food location, then applies simple logic to decide the 
-best move (Straight, Right, Left) to survive and eat food. (Description made by AI)
+best move (Straight, Right, Left) to survive and eat food. This code was mostly made by AI, and how it performs is really funny, that is why I kept it.
 """
 
 import random

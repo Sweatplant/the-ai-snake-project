@@ -57,7 +57,7 @@ def main():
     CELL_SIZE = 30
 
     # game speed
-    FPS = 1000000
+    FPS = 10000
 
     # initialize engine and renderer
     engine = my_ai.SnakeEngine(GRID_WIDTH, GRID_HEIGHT)
@@ -101,8 +101,7 @@ def main():
         # If the snake is dead, add score to barchart and reset the game
         if not alive:
             games_played += 1
-            print(f"Game {games_played} ended | Score: {score} | High Score: {high_score}")
-
+            
             # Record scores for plotting
             scores_history.append(score)
             total_score += score
@@ -111,6 +110,7 @@ def main():
             # Update barchart
             update_plot(scores_history, mean_scores_history)
 
+            print(f"Game {games_played} ended | Score: {score} | Mean Score: {mean_scores_history[-1]:.2f} | High Score: {high_score}")
             engine.reset()
 
         # Render the game state

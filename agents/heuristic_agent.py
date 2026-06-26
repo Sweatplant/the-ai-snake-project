@@ -2,12 +2,12 @@
 @file heuristic_agent.py
 @brief Heuristic (rule-based) agent for the Snake game.
 @author Sam Ro
-@date 25/06/2026
-@version 1.0
+@date 26/06/2026
+@version 2.0
 @details This agent uses hardcoded rules to play the Snake game.
 It calculates an 11-value binary state vector representing immediate 
 dangers and food location, then applies simple logic to decide the 
-best move (Straight, Right, Left) to survive and eat food. (Description made by AI)
+best move (Straight, Right, Left) to survive and eat food. The code is a sloppy mess, but well it works(Description made by AI)
 """
 
 import random
@@ -119,15 +119,21 @@ class HeuristicAgent:
         
         # Define our current moving direction helper
         current_direction = None
-        if moving_up:    current_direction = self.UP
+        if moving_up:      current_direction = self.UP
         elif moving_down:  current_direction = self.DOWN
         elif moving_left:  current_direction = self.LEFT
         elif moving_right: current_direction = self.RIGHT
 
-
+        
         # Rule-based decision making
         if moving_up:
-            if food_up and not danger_straight:
+            if danger_left and danger_right:
+                return self.UP
+            elif danger_straight and danger_right:
+                return self.LEFT
+            elif danger_straight and danger_left:
+                return self.RIGHT
+            elif food_up and not danger_straight:
                 return self.UP
             elif food_left and not danger_left:
                 return self.LEFT
@@ -141,7 +147,13 @@ class HeuristicAgent:
                 return self.RIGHT
                 
         elif moving_down:
-            if food_down and not danger_straight:
+            if danger_left and danger_right:
+                return self.DOWN
+            elif danger_straight and danger_right:
+                return self.RIGHT
+            elif danger_straight and danger_left:
+                return self.LEFT
+            elif food_down and not danger_straight:
                 return self.DOWN
             elif food_right and not danger_left:
                 return self.RIGHT
@@ -150,12 +162,18 @@ class HeuristicAgent:
             elif not danger_straight:
                 return self.DOWN
             elif not danger_left:
-                return self.LEFT
-            elif not danger_right:
                 return self.RIGHT
+            elif not danger_right:
+                return self.LEFT
                 
         elif moving_left:
-            if food_left and not danger_straight:
+            if danger_left and danger_right:
+                return self.LEFT
+            elif danger_straight and danger_right:
+                return self.DOWN
+            elif danger_straight and danger_left:
+                return self.UP
+            elif food_left and not danger_straight:
                 return self.LEFT
             elif food_up and not danger_right:
                 return self.UP
@@ -164,12 +182,18 @@ class HeuristicAgent:
             elif not danger_straight:
                 return self.LEFT
             elif not danger_left:
-                return self.LEFT
+                return self.DOWN
             elif not danger_right:
-                return self.RIGHT
+                return self.UP
                 
         elif moving_right:
-            if food_right and not danger_straight:
+            if danger_left and danger_right:
+                return self.RIGHT
+            elif danger_straight and danger_right:
+                return self.UP
+            elif danger_straight and danger_left:
+                return self.DOWN
+            elif food_right and not danger_straight:
                 return self.RIGHT
             elif food_up and not danger_left:
                 return self.UP
@@ -178,9 +202,9 @@ class HeuristicAgent:
             elif not danger_straight:
                 return self.RIGHT
             elif not danger_left:
-                return self.LEFT
+                return self.UP
             elif not danger_right:
-                return self.RIGHT
+                return self.DOWN
         
         #This part only runs if the snake is completely trapped.
         # We look at all non-180 turns and pick one that is physically possible.
@@ -195,3 +219,36 @@ class HeuristicAgent:
             possible_fallbacks = [self.RIGHT, self.UP, self.DOWN]
             
         return random.choice(possible_fallbacks)
+
+        # # Rule-based decision making V2
+        # # map current direction to moves (straight, right, left)
+        # if current_direction == self.UP:
+        #     moves = [self.UP, self.RIGHT, self.LEFT]
+        # elif current_direction == self.DOWN:
+        #     moves = [self.DOWN, self.RIGHT, self.LEFT]
+        # elif current_direction == self.LEFT:
+        #     moves = [self.LEFT, self.UP, self.DOWN]
+        # elif current_direction == self.RIGHT:
+        #     moves = [self.RIGHT, self.UP, self.DOWN]
+
+        # # Check for safe moves
+        # safe_moves = []
+
+        # if not danger_straight:
+        #     safe_moves.append(moves[0])  # straight
+        # if not danger_right:
+        #     safe_moves.append(moves[1])  # right
+        # if not danger_left:
+        #     safe_moves.append(moves[2])  # left
+
+        # # sadly no safe moves
+        # if not safe_moves:
+        #     return moves[random.randint(0, 2)]
+        
+        # # only one safe move
+        # if len(safe_moves) == 1:
+        #     return safe_moves[0]
+        
+        # return safe_moves[random.randint(0, len(safe_moves) - 1)]
+
+        
