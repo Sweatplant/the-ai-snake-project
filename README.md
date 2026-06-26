@@ -112,5 +112,5 @@ py -3 -m venv .venv
 python -m pip install --upgrade pip
 python -m pip install pygame
 pip install . --force-reinstall --no-cache-dir --config-settings=cmake.args="-A x64"
-python play_human.py
+python [play_human or train].py
 ```
