@@ -9,7 +9,8 @@ This project includes:
 - a C++ game engine in [src](src)
 - a Python module built with nanobind
 - a playable version in [play_human.py](play_human.py)
-- a placeholder training script in [train_ai.py](train_ai.py)
+- a training script in [train.py](train.py)
+- several AI agent implementations in [agents](agents)
 
 ## Requirements
 
@@ -72,13 +73,18 @@ Use the arrow keys to move the snake. If you hit a wall or your own tail, the ro
 
 ## Project files
 
-- [play_human.py]: runs the human-playable version
-- [train_ai.py]: placeholder for future training work
-- [src/main.cpp]: Python/C++ binding entry point
-- [src/snake_engine.cpp]: game logic
-- [src/snake_engine.hpp]: engine declarations
-- [snake_ui/renderer.py]: rendering code
-- [CMakeLists.txt] & [pyproject.toml]: The backend build configuration files.
+- [play_human.py](play_human.py): runs the human-playable version
+- [train.py](train.py): training and execution loop for the AI agents
+- [agents/heuristic_agent.py](agents/heuristic_agent.py): heuristic-based agent
+- [agents/heuristic_agent_ai.py](agents/heuristic_agent_ai.py): funny heuristic-based agent
+- [agents/tabular_agent.py](agents/tabular_agent.py): tabular agent module, yet to be implemented
+- [agents/DQN_agent.py](agents/DQN_agent.py): DQN agent module, yet to be implemented
+- [agents/gradientMethods_agent.py](agents/gradientMethods_agent.py): gradient methods agent module, yet to be implemented
+- [src/main.cpp](src/main.cpp): Python/C++ binding entry point
+- [src/snake_engine.cpp](src/snake_engine.cpp): game logic
+- [src/snake_engine.hpp](src/snake_engine.hpp): engine declarations
+- [snake_ui/renderer.py](snake_ui/renderer.py): rendering code
+- [CMakeLists.txt](CMakeLists.txt) & [pyproject.toml](pyproject.toml): The backend build configuration files.
 
 ## Troubleshooting
 
