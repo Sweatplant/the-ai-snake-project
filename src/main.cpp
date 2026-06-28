@@ -11,6 +11,7 @@
 #include <nanobind/stl/vector.h> // Crucial for auto-converting Python lists to C++ vectors (and the other way around)
 #include <nanobind/stl/pair.h>   // Crucial for auto-converting Python tuples to C++ pairs (and the other way around)
 #include "snake_engine.hpp"
+#include "vision_engine.hpp"
 
 namespace nb = nanobind;
 
@@ -37,4 +38,7 @@ NB_MODULE(my_ai, m) {
         .def("get_food_position", &SnakeEngine::get_food_position)
         .def("get_score", &SnakeEngine::get_score)
         .def("is_game_over", &SnakeEngine::is_game_over);
+
+    // Basic vision function:
+    m.def("get_basic_vision", &VisionEngine::get_basic_vision, "Computes 11-value binary state vector");
 } 
