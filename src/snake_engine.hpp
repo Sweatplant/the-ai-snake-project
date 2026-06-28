@@ -2,7 +2,7 @@
  * @file snake_engine.hpp
  * @brief Structural blueprint for the core Snake Game rules and memory state.
  * @author Sam Ro
- * @version 1.0
+ * @version 1.1
  * @date 26/05/2026
  * @details This file declares the SnakeEngine class, tracking grid dimensions,
  * snake body coordinates, food positions, and scoring math. 
@@ -61,6 +61,11 @@ class SnakeEngine {
         std::pair<int, int> get_food_position() const { return food_pos; }
         int get_score() const { return score; }
         bool is_game_over() const { return game_over; }
+
+        // vision_engine getters
+        int get_width() const { return width; }
+        int get_height() const { return height; }
+        Direction get_direction() const { return current_dir; }
 };
 
 
