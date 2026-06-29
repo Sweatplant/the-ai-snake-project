@@ -13,7 +13,6 @@ best move (Straight, Right, Left) to survive and eat food. The code is a sloppy 
 import random
 import config
 import my_ai
-import timeit
 
 class HeuristicAgent:
     def __init__(self):
