@@ -46,12 +46,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 Then activate the environment again.
 
-Upgrade pip:
-
-```powershell
-python -m pip install --upgrade pip
-```
-
 Install the required packages:
 
 ```powershell
@@ -75,14 +69,18 @@ Use the arrow keys to move the snake. If you hit a wall or your own tail, the ro
 
 - [play_human.py](play_human.py): runs the human-playable version
 - [train.py](train.py): training and execution loop for the AI agents
+- [config.py](config.py): project configuration and settings
+- [weights/](weights/): saved model weights and training checkpoints
 - [agents/heuristic_agent.py](agents/heuristic_agent.py): heuristic-based agent
 - [agents/heuristic_agent_ai.py](agents/heuristic_agent_ai.py): funny heuristic-based agent
 - [agents/tabular_agent.py](agents/tabular_agent.py): tabular agent module, yet to be implemented
-- [agents/DQN_agent.py](agents/DQN_agent.py): DQN agent module, yet to be implemented
-- [agents/gradientMethods_agent.py](agents/gradientMethods_agent.py): gradient methods agent module, yet to be implemented
+- [agents/dqn_agent.py](agents/dqn_agent.py): DQN agent module, yet to be implemented
+- [agents/pgm_agent.py](agents/pgm_agent.py): probabilistic graphical model agent module, yet to be implemented
 - [src/main.cpp](src/main.cpp): Python/C++ binding entry point
 - [src/snake_engine.cpp](src/snake_engine.cpp): game logic
 - [src/snake_engine.hpp](src/snake_engine.hpp): engine declarations
+- [src/vision_engine.cpp](src/vision_engine.cpp): vision processing implementation
+- [src/vision_engine.hpp](src/vision_engine.hpp): vision engine declarations
 - [snake_ui/renderer.py](snake_ui/renderer.py): rendering code
 - [CMakeLists.txt](CMakeLists.txt) & [pyproject.toml](pyproject.toml): The backend build configuration files.
 
