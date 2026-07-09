@@ -2,8 +2,8 @@
  * @file vision_engine.cpp
  * @brief Implementation of perception logic and AI state extraction.
  * @author Sam Ro
- * @version 1.0
- * @date 29/06/2026
+ * @version 1.1
+ * @date 09/07/2026
  * @details This file translates the raw internal state of the SnakeEngine 
  * into formatted observation vectors suitable for training various 
  * RL agents. (Description made by AI)
@@ -90,6 +90,61 @@
         state[10] = (food.first > head_x) ? 1:0;  // Food Right
 
     
+        return state;
+    }
+
+    std::vector<int> get_ray_vision(const SnakeEngine& engine, int RAY_LENGTH) {
+        std::vector<int> state(16,0);
+
+        // get all the needed things
+        auto snake = engine.get_snake_body();
+        auto head = snake.front();
+        auto food = engine.get_food_position();
+
+        Direction dir = engine.get_direction();
+        int width = engine.get_width();
+        int height = engine.get_height();
+
+        // get x and y coordinates for the head
+        int head_x = head.first;
+        int head_y = head.second;
+
+        // Define the 8 ray directions (N, NE, E, SE, S, SW, W, NW)
+        std::vector<std::pair<int,int>> ray_directions = {
+            {0,-1}, {1,-1}, {1,0}, {1,1},
+            {0,1}, {-1,1}, {-1,0}, {-1,-1}
+        };
+
+        for (int i = 0; i < 8; ++i) {
+            int danger_distance = RAY_LENGTH + 1; // Initialize to max distance + 1
+
+            for (int step = 1; step <= RAY_LENGTH; ++step) {
+                int new_x = head_x + ray_directions[i].first * step;
+                int new_y = head_y + ray_directions[i].second * step;
+
+                // Check for wall and or self collision
+                if (new_x < 0 || new_x >= width || new_y < 0 || new_y >= height ||
+                    std::find(snake.begin(), snake.end(), std::make_pair(new_x,new_y)) != snake.end()) {
+                    danger_distance = step;
+                    break;
+                }
+            }
+            // distance to danger (0-7)
+            state[i] = danger_distance;
+        }
+
+        // current direction (8-11)
+        state[8] = (dir == UP) ? 1:0;
+        state[9] = (dir == DOWN) ? 1:0;
+        state[10] = (dir == LEFT) ? 1:0;
+        state[11] = (dir == RIGHT) ? 1:0;
+
+        // food location (12-15)
+        state[12] = (food.second < head_y) ? 1:0;  // Food Up
+        state[13] = (food.second > head_y) ? 1:0;  // Food Down
+        state[14] = (food.first < head_x) ? 1:0;   // Food Left
+        state[15] = (food.first > head_x) ? 1:0;  // Food Right
+        
         return state;
     }
  }

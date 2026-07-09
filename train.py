@@ -2,8 +2,8 @@
 @file train.py
 @brief Universal training and execution loop for Snake AI.
 @author Sam Ro
-@date 26/06/2026
-@version 1.1
+@date 09/07/2026
+@version 1.2
 @details This script initializes the C++ SnakeEngine and a Pygame renderer, 
 then runs an automated game loop using the specified AI agent. It is designed
 to easily swap out different AI brains (Heuristic, Tabular, DQN, PGM) by changing
@@ -32,26 +32,26 @@ if config.VISUALISATION_ENABLED:
     # Enable interactive plotting mode in Matplotlib
     plt.ion()
 
-def create_agent(agent_type):
+def create_agent(agent_type, vision_type):
     """
     Factory function to initialize and return the selected AI agent. 
     Makes it easy to swap out agents, and add new ones.
     """
     if agent_type == "heuristic":
         from agents.heuristic_agent import HeuristicAgent
-        return HeuristicAgent()
+        return HeuristicAgent() # HeuristicAgent only uses basic vision
     elif agent_type == "heuristic_ai":
         from agents.heuristic_agent_ai import HeuristicAgent
-        return HeuristicAgent()
+        return HeuristicAgent() # HeuristicAgent only uses basic vision
     elif agent_type == "tabular":
         from agents.tabular_agent import TabularAgent
-        return TabularAgent()
+        return TabularAgent(vision_type)
     elif agent_type == "dqn":
         from agents.dqn_agent import DQNAgent
-        return DQNAgent()
+        return DQNAgent(vision_type)
     elif agent_type == "pgm":
         from agents.pgm_agent import PGMAgent
-        return PGMAgent()
+        return PGMAgent(vision_type)
 
     else:
         raise ValueError(f"Unknown AGENT_TYPE: {agent_type}, give a valid agent")
@@ -128,6 +128,12 @@ def main():
     GRID_HEIGHT = config.GRID_HEIGHT
     CELL_SIZE = config.CELL_SIZE
 
+    # setup rewards and other constants
+    REWARD_DYING = config.REWARD_DYING
+    REWARD_EATING = config.REWARD_EATING
+    REWARD_NOTHING = config.REWARD_NOTHING
+    SAVE_FREQUENCY = config.SAVE_FREQUENCY
+
     # game speed
     FPS = config.FPS
 
@@ -135,11 +141,12 @@ def main():
     engine = my_ai.SnakeEngine(GRID_WIDTH, GRID_HEIGHT)
     
     renderer = None
-    if config.RENDERER_ENABLED:
+    renderer_enabled = config.RENDERER_ENABLED
+    if renderer_enabled:
         renderer = SnakeRenderer(GRID_WIDTH, GRID_HEIGHT, CELL_SIZE)
 
     # initialize agent
-    agent = create_agent(config.AGENT_TYPE)
+    agent = create_agent(config.AGENT_TYPE, config.VISION_TYPE)
     print(f"Using agent: {agent.__class__.__name__}")
 
     clock = pygame.time.Clock()
@@ -156,7 +163,7 @@ def main():
     running = True
     while running:
         # to quit
-        if config.RENDERER_ENABLED:
+        if renderer_enabled:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -167,28 +174,56 @@ def main():
         # Decide on an action based on the state
         action = agent.get_action(state)
 
-        # Send action to engine and get alive status
+        # get old score and store it
+        old_score = engine.get_score()
+
+        # next step
         alive = engine.step(action)
+        game_over = not alive
+        new_score = engine.get_score()
+
+        # calculate reward
+        reward = 0
+        if game_over:
+            reward = REWARD_DYING # penalty for dying
+        elif new_score > old_score:
+            reward = REWARD_EATING # reward for eating
+        else:
+            reward = REWARD_NOTHING # penalty for just being alive but not eating
+
+        # get new state after moving
+        next_state = agent.get_state(engine)
+
+        # update the agent (only when the agent has an update method)
+        if hasattr(agent,'update'):
+            agent.update(state, action, reward, next_state, game_over)
 
         # Update high score if necessary
-        score = engine.get_score()
-        if score > high_score:
-            high_score = score
+        if new_score > high_score:
+            high_score = new_score
 
         # If the snake is dead, add score to barchart and reset the game
-        if not alive:
+        if game_over:
             games_played += 1
             
+            # decay epsilon and save model (if the agent has decay_epsilon method)
+            if hasattr(agent, 'decay_epsilon'):
+                agent.decay_epsilon()
+
+            # save the model every SAVE_FREQUENCY games (if the agent has save_model method)
+            if hasattr(agent, 'save_model') and games_played % SAVE_FREQUENCY == 0:
+                agent.save_model()
+
             # Record scores for plotting
-            scores_history.append(score)
-            total_score += score
+            scores_history.append(new_score)
+            total_score += new_score
             mean_scores_history.append(total_score / games_played)
 
             # Update barchart only when visualization is enabled
             if config.VISUALISATION_ENABLED:
                 update_plot(scores_history, mean_scores_history)
 
-            print(f"Game {games_played} ended | Score: {score} | Mean Score: {mean_scores_history[-1]:.2f} | High Score: {high_score}")
+            print(f"Game {games_played} ended | Score: {new_score} | Mean Score: {mean_scores_history[-1]:.2f} | High Score: {high_score}")
             
             # Print advanced periodic statistic logs
             if games_played % config.STATISTICS_LOG_INTERVAL == 0:
@@ -202,18 +237,22 @@ def main():
                 print(f"Median Score (Center): {statistics.median(scores_history):.1f}")
                 print(f"Standard Dev (SD):     {statistics.pstdev(scores_history):.2f}")
                 print(f"Best / Worst Runs:     {max(scores_history)} / {min(scores_history)}")
+                if hasattr(agent, 'epsilon'):
+                    print(f"Current Epsilon:       {agent.epsilon:.4f}")
+                print(f"Unique states in Q-table: {len(agent.q_table)}")
                 print("="*35 + "\n")
-            
+                
             
             engine.reset()
 
         # Render the game state
-        if config.RENDERER_ENABLED:
+        if renderer_enabled:
             renderer.render(engine)
 
         # Frame rate control
         clock.tick(FPS)
-    if config.RENDERER_ENABLED:
+
+    if renderer_enabled:
         pygame.quit()
 
     if config.VISUALISATION_ENABLED:

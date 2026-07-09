@@ -41,4 +41,6 @@ NB_MODULE(my_ai, m) {
 
     // Basic vision function:
     m.def("get_basic_vision", &VisionEngine::get_basic_vision, "Computes 11-value binary state vector");
+    // Ray vision function:
+    m.def("get_ray_vision", &VisionEngine::get_ray_vision, "Computes 16-value binary state vector");
 } 
