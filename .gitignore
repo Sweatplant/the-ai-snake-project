@@ -15,3 +15,6 @@ dist/
 
 # Windows/OS files
 Thumbs.db
+
+# Model weights
+weights/
