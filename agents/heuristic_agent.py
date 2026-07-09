@@ -26,6 +26,7 @@ class HeuristicAgent:
         self.width = config.GRID_WIDTH
         self.height = config.GRID_HEIGHT
 
+
     def get_state(self, engine):
         """
         Computes an 11-value binary state vector based on the current game state.

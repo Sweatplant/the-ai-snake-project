@@ -12,10 +12,13 @@ the Bellman equation to learn optimal moves over time via trial and error. (Desc
 import random
 import pickle
 import config
+import my_ai
+import os
 
 class TabularAgent:
-    def __init__(self):
+    def __init__(self, vision_type="basic"):
         self.model_path = "weights/tabular_q_table.pkl"
+        self.vision_type = vision_type
         
         # C++ action enum values mapping
         self.UP = 0
@@ -46,111 +49,89 @@ class TabularAgent:
         
     def get_state(self, engine):
         """
-        Computes an 11-value binary state vector based on the current game state.
+        Computes an (11 for basic or 16 for rayvision)-value binary state vector based on the current game state.
         The vector indicates immediate dangers (walls, self-collision) and food location.
         """
-        snake = engine.get_snake_body()
-        head_x, head_y = snake[0]
+        # convert from list (due to nanobind) to tuple before returning
+        if self.vision_type == "basic":
+            return tuple(my_ai.get_basic_vision(engine))
+        elif self.vision_type == "ray":
+            return tuple(my_ai.get_ray_vision(engine, config.RAY_LENGTH))
 
-        if len(snake) == 1:
-            neck_x, neck_y = head_x - 1, head_y  # Assuming the snake is moving right initially
-        else:
-            neck_x, neck_y = snake[1]
-
-        # Determine current direction
-        if head_x == neck_x:
-            if head_y < neck_y: # not sure if this is correct
-                direction = self.UP
-            else:
-                direction = self.DOWN
-        elif head_y == neck_y:
-            if head_x < neck_x:
-                direction = self.LEFT
-            else:
-                direction = self.RIGHT
-
-        # get adjacent point coordinates (to head)
-        point_U = (head_x, head_y - 1)
-        point_D = (head_x, head_y + 1)
-        point_L = (head_x - 1, head_y)
-        point_R = (head_x + 1, head_y)
-
-        def is_collision(point):
-            x, y = point
-            # Check wall collision
-            if x < 0 or x >= self.width or y < 0 or y >= self.height:
-                return True
-            # Check self-collision
-            if point in snake:
-                return True
-            return False # return False if no collision
-        
-        # Determine danger in each direction based on current direction
-        danger_straight = False
-        danger_right = False
-        danger_left = False
-
-        if direction == self.UP:
-            danger_straight = is_collision(point_U)
-            danger_right = is_collision(point_R)
-            danger_left = is_collision(point_L)
-        if direction == self.DOWN:
-            danger_straight = is_collision(point_D)
-            danger_right = is_collision(point_L)
-            danger_left = is_collision(point_R)
-        if direction == self.LEFT:
-            danger_straight = is_collision(point_L)
-            danger_right = is_collision(point_U)
-            danger_left = is_collision(point_D)
-        if direction == self.RIGHT:
-            danger_straight = is_collision(point_R)
-            danger_right = is_collision(point_D)
-            danger_left = is_collision(point_U)
-
-        # Get food position
-        food_x, food_y = engine.get_food_position()
-        food_up = food_y < head_y
-        food_down = food_y > head_y
-        food_left = food_x < head_x
-        food_right = food_x > head_x
-
-        # Create state vector
-        state = [
-            int(danger_straight),  # Danger straight
-            int(danger_right),     # Danger right
-            int(danger_left),      # Danger left
-            int(direction == self.UP),    # Moving up
-            int(direction == self.DOWN),  # Moving down
-            int(direction == self.LEFT),  # Moving left
-            int(direction == self.RIGHT), # Moving right
-            int(food_up),           # Food up
-            int(food_down),         # Food down
-            int(food_left),         # Food left
-            int(food_right)         # Food right
-        ]
-        return state
+    def get_q_values(self, state):
+        """
+        Helper function to get Q-values for a state, and if it does not exist it will initialize with zeros for all directions
+        """
+        if state not in self.q_table:
+            self.q_table[state] = [0.0, 0.0, 0.0, 0.0]
+        return self.q_table[state]
 
     def get_action(self, state):
         """
-        get action
+        Selects an action using epsilon-greedy policy
         """
+        # exploration (pick random action)
+        if random.random() < self.epsilon:
+            return random.randint(0, 3) # it should learn that it dies so even dangerous actions are possible
 
-    def update():
+        # exploitation (pick the best known action for this state)
+        q_values = self.get_q_values(state)
+        max_q = max(q_values)
+
+        # if multiple actions have the same q-value, pick random one
+        best_actions = []
+        for i, q in enumerate(q_values):
+            if q == max_q:
+                best_actions.append(i)
+        return random.choice(best_actions)
+
+    def update(self, state, action, reward, next_state, game_over):
         """
-        Update
+        Update the Q-table using Bellman Equation
         """
+        if not self.training_enabled:
+            return
         
-    def decay_epsilon():
-        """
-        Reduces exploration, is it needed?
-        """
+        q_values = self.get_q_values(state)
+        next_q_values = self.get_q_values(next_state)
 
-    def save_model():
+        # if game is over / snake is dead, next q values are zero
+        if game_over:
+            max_next_q = 0.0
+        else:
+            max_next_q = max(next_q_values)
+        
+        # Q learning algorithm:
+        q_values[action] = q_values[action] + self.alpha*(reward + self.gamma * max_next_q - q_values[action])
+        
+    def decay_epsilon(self):
+        """
+        Reduces exploration over time
+        """
+        if self.training_enabled:
+            self.epsilon *= self.epsilon_decay
+            self.epsilon = max(self.epsilon_min, self.epsilon)
+
+    def save_model(self):
         """
         Save the trained model
+        TODO add versioning
         """
+        if not self.training_enabled:
+            return
         
-    def load_model():
+        # write to table
+        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+        with open(self.model_path, "wb") as f:
+            pickle.dump(self.q_table, f)
+        
+    def load_model(self):
         """
         Load the previously trained model
         """
+        if os.path.exists(self.model_path):
+            with open(self.model_path, "rb") as f:
+                self.q_table = pickle.load(f)
+            print(f"Loaded Q-table with {len(self.q_table)} states.")
+        else:
+            print("No existing Q-table found. making new one.")
