@@ -46,6 +46,9 @@ def create_agent(agent_type, vision_type):
     elif agent_type == "tabular":
         from agents.tabular_agent import TabularAgent
         return TabularAgent(vision_type)
+    elif agent_type == "tabular_mb":
+        from agents.tabular_agent_mb import TabularAgent
+        return TabularAgent(vision_type)
     elif agent_type == "dqn":
         from agents.dqn_agent import DQNAgent
         return DQNAgent(vision_type)
@@ -239,7 +242,7 @@ def main():
                 print(f"Best / Worst Runs:     {max(scores_history)} / {min(scores_history)}")
                 if hasattr(agent, 'epsilon'):
                     print(f"Current Epsilon:       {agent.epsilon:.4f}")
-                print(f"Unique states in Q-table: {len(agent.q_table)}")
+                # print(f"Unique states in Q-table: {len(agent.q_table)}")
                 print("="*35 + "\n")
                 
             
