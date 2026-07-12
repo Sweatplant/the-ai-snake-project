@@ -15,6 +15,7 @@
 
  #include "snake_engine.hpp"
  #include <vector>
+ #include <string>
 
  namespace VisionEngine {
     /**
@@ -25,6 +26,8 @@
      */
     std::vector<int> get_basic_vision(const SnakeEngine& engine);
     std::vector<int> get_ray_vision(const SnakeEngine& engine, int RAY_LENGTH = 5);   
+    std::vector<int> get_grid_vision(const SnakeEngine& engine, const std::vector<std::string>& channels);
+
  }
 
  #endif // VISION_ENGINE_HPP

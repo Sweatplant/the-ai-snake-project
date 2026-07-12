@@ -2,8 +2,8 @@
  * @file vision_engine.cpp
  * @brief Implementation of perception logic and AI state extraction.
  * @author Sam Ro
- * @version 1.1
- * @date 09/07/2026
+ * @version 1.2
+ * @date 11/07/2026
  * @details This file translates the raw internal state of the SnakeEngine 
  * into formatted observation vectors suitable for training various 
  * RL agents. (Description made by AI)
@@ -94,6 +94,7 @@
     }
 
     std::vector<int> get_ray_vision(const SnakeEngine& engine, int RAY_LENGTH) {
+        // todo: I think you could cut down one danger direction because the snake cannot go backwards into itself
         std::vector<int> state(16,0);
 
         // get all the needed things
@@ -145,6 +146,46 @@
         state[14] = (food.first < head_x) ? 1:0;   // Food Left
         state[15] = (food.first > head_x) ? 1:0;  // Food Right
         
+        return state;
+    }
+
+    std::vector<int> get_grid_vision(const SnakeEngine& engine, const std::vector<std::string>& channels) {
+        int width = engine.get_width();
+        int height = engine.get_height();
+        int layer_size = width * height;
+
+        // Initialize all channels with zeros
+        std::vector<int> state(channels.size() * layer_size, 0);
+
+        // get engine states
+        auto snake = engine.get_snake_body();
+        auto head = snake.front();
+        auto food = engine.get_food_position();
+        // TODO: ADD OTHER CHANNELS LIKE WALLS, ENEMY SNAKES, ETC. 
+
+        // Fill in the channels based on the requested channels
+        for (size_t c=0; c<channels.size(); ++c) {
+            int channel_offset = c * layer_size;
+            const std::string& channel_name = channels[c];
+
+            if (channel_name == "head") {
+                // place 1 at head position
+                state[channel_offset + head.second * width + head.first] = 1;
+            }
+            else if (channel_name == "body") {
+                // place 1 at all body positions (no head)
+                for (size_t i=1; i<snake.size(); ++i) {
+                    int bx = snake[i].first;
+                    int by = snake[i].second;
+                    state[channel_offset + by * width + bx] = 1;
+                }
+            }
+            else if (channel_name == "food") {
+                // place 1 at food position
+                state[channel_offset + food.second * width + food.first] = 1;
+            }
+            // TODO: additional channels added here
+        }
         return state;
     }
  }
