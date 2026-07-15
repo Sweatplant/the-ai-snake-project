@@ -17,4 +17,4 @@ dist/
 Thumbs.db
 
 # Model weights
-weights/
+weights/*
