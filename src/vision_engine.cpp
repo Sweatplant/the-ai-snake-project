@@ -10,6 +10,7 @@
  */
 
  #include "vision_engine.hpp"
+ #include <algorithm> // added because otherwise it crashes on linux
 
  namespace VisionEngine {
     std::vector<int> get_basic_vision(const SnakeEngine& engine) {
