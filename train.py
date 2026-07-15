@@ -135,6 +135,9 @@ def main():
     REWARD_DYING = config.REWARD_DYING
     REWARD_EATING = config.REWARD_EATING
     REWARD_NOTHING = config.REWARD_NOTHING
+    REWARD_CLOSER = config.REWARD_CLOSER
+    REWARD_FURTHER = config.REWARD_FURTHER
+
     SAVE_FREQUENCY = config.SAVE_FREQUENCY
 
     # game speed
@@ -180,10 +183,20 @@ def main():
         # get old score and store it
         old_score = engine.get_score()
 
+        # calculate current distance to food
+        head = engine.get_snake_body()[0]
+        food = engine.get_food_position()
+        dist_before = abs(head[0] - food[0]) + abs(head[1] - food[1])
+
         # next step
         alive = engine.step(action)
         game_over = not alive
         new_score = engine.get_score()
+
+        # calculate new distance
+        head = engine.get_snake_body()[0]
+        food = engine.get_food_position()
+        dist_after = abs(head[0] - food[0]) + abs(head[1] - food[1])
 
         # calculate reward
         reward = 0
@@ -191,8 +204,14 @@ def main():
             reward = REWARD_DYING # penalty for dying
         elif new_score > old_score:
             reward = REWARD_EATING # reward for eating
+        elif REWARD_CLOSER != 0:
+            # Bonus for getting closer, penalty for moving further away
+            if dist_after < dist_before:
+                reward = REWARD_CLOSER  # Small positive reward for approaching
+            else:
+                reward = REWARD_FURTHER # Small penalty for moving away
         else:
-            reward = REWARD_NOTHING # penalty for just being alive but not eating
+             reward = REWARD_NOTHING # penalty for just being alive but not eating
 
         # get new state after moving
         next_state = agent.get_state(engine)
@@ -226,7 +245,7 @@ def main():
             if config.VISUALISATION_ENABLED:
                 update_plot(scores_history, mean_scores_history)
 
-            print(f"Game {games_played} ended | Score: {new_score} | Mean Score: {mean_scores_history[-1]:.2f} | High Score: {high_score}")
+            # print(f"Game {games_played} ended | Score: {new_score} | Mean Score: {mean_scores_history[-1]:.2f} | High Score: {high_score}")
             
             # Print advanced periodic statistic logs
             if games_played % config.STATISTICS_LOG_INTERVAL == 0:
@@ -237,6 +256,7 @@ def main():
                 print("="*35)
                 print(f"Total Food Consumed:   {total_score}")
                 print(f"Mean Score (Average):  {statistics.mean(scores_history):.2f}")
+                print(f"Mean Score (Average last 50 games):  {statistics.mean(scores_history[-50:]):.2f}")
                 print(f"Median Score (Center): {statistics.median(scores_history):.1f}")
                 print(f"Standard Dev (SD):     {statistics.pstdev(scores_history):.2f}")
                 print(f"Best / Worst Runs:     {max(scores_history)} / {min(scores_history)}")

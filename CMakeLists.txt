@@ -15,6 +15,7 @@ nanobind_add_module(
     my_ai
     src/main.cpp
     src/snake_engine.cpp
+    src/vision_engine.cpp
 )
 
 # Install the compiled extension into the Python package root
