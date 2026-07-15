@@ -10,6 +10,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/vector.h> // Crucial for auto-converting Python lists to C++ vectors (and the other way around)
 #include <nanobind/stl/pair.h>   // Crucial for auto-converting Python tuples to C++ pairs (and the other way around)
+#include <nanobind/stl/string.h>
 #include "snake_engine.hpp"
 #include "vision_engine.hpp"
 
