@@ -54,7 +54,9 @@ class QNetwork(nn.Module):
                 nn.ReLU(),
                 nn.Conv2d(32, 64, kernel_size=3, padding=1),
                 nn.ReLU(),
-                nn.Conv2d(64, 64, kernel_size=3, padding=1),
+                nn.Conv2d(64, 128, kernel_size=3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(128, 128, kernel_size=3, padding=1),
                 nn.ReLU(),
                 nn.Flatten()
             )
@@ -65,11 +67,11 @@ class QNetwork(nn.Module):
 
             # fully connected layers
             self.classifier = nn.Sequential(
-                nn.Linear(self.flattened_size, 64),
+                nn.Linear(self.flattened_size, 256),
                 nn.ReLU(),
-                nn.Linear(64, 64),
+                nn.Linear(256, 128),
                 nn.ReLU(),
-                nn.Linear(64, 64),
+                nn.Linear(128, 64),
                 nn.ReLU(),
                 nn.Linear(64, output_dim)
             )
